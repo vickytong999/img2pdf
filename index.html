@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片转PDF工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .file-upload-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        
+        .file-upload-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .file-list {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f7f7f7;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .file-item:hover {
+            background: #f0f0f0;
+        }
+        
+        .file-name {
+            flex: 1;
+            color: #333;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .remove-btn {
+            padding: 4px 8px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        
+        .remove-btn:hover {
+            background: #dc2626;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            animation: fadeIn 0.3s;
+        }
+        
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ 图片转PDF工具</h1>
+        
+        <div class="form-group">
+            <label for="imageFiles">选择图片文件</label>
+            <input type="file" id="imageFiles" multiple accept="image/*">
+            <label for="imageFiles" class="file-upload-btn">选择图片文件</label>
+            <div class="file-list" id="fileList">
+                <div class="empty-state">还没有选择文件</div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="outputName">输出文件名</label>
+            <input type="text" id="outputName" placeholder="output.pdf" value="output.pdf">
+        </div>
+        
+        <div class="button-group">
+            <button class="btn btn-primary" id="convertBtn" disabled>
+                转换为PDF
+            </button>
+            <button class="btn btn-secondary" id="clearBtn">
+                清除所有
+            </button>
+        </div>
+        
+        <div id="statusMessage"></div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
